@@ -73,7 +73,7 @@ func (cl *ContactList) UpdateContact(name string, phone, email, address *string)
 
 		
 	}
-	return errors.New("Contacto no encontrado")
+	return errors.New("contacto no encontrado")
 
 }
 	
@@ -84,11 +84,11 @@ func (cl *ContactList) RemoveContact(name string) error {
 			return nil
 		}
 	}
-	return errors.New("Contacto no encontrado")	
+	return errors.New("contacto no encontrado")	
 }
 
 func main(){
-	contactList := ContactList{}
+	contactList := &ContactList{}
 
 	contactList.AddContact("Raul Gonzalez", "999222333", "raul@correo.com", "Av. Felicidad 123")
 	contactList.AddContact("Carla Acuña", "999222334", "carla@correo.com", "Av. San Borja 123")
@@ -128,9 +128,12 @@ func main(){
 	contactList.ShowContactList()
 	
 }
-	
+
+
+
+
 /*
-//3.Software bibliotecario
+//3. Software bibliotecario
 
 type BookStatus string
 
@@ -140,43 +143,14 @@ const (
 )
 
 type Book struct {
-	Title string
-	Author  string
-	Genre string
+	Title  string
+	Author string
+	Genre  string
 	Status BookStatus
 }
 
 type Library struct {
 	books []Book
-}
-
-func (l *Library) AddBook(title, author, genre string) {
-	book := Book{
-		Title: title,
-		Author: author,
-		Genre: genre,
-		Status: Available,
-	}
-	l.books = append(l.books, book)
-}
-
-func (l *Library) showLibrary(){
-	fmt.Println("Colección de libros de la Libreria:")
-	fmt.Println("==========================")
-	for _, book := range l.books {
-		fmt.Printf(" Titulo: %s\n Autor: %s\n Género: %s\n Status: %s\n",book.Title, book.Author, book.Genre, book.Status)
-		fmt.Println("---------------------------")
-	}
-}
-
-func (l *Library) UpdateBookStatus(title string, status BookStatus) error {
-	for i, book := range l.books {
-		if book.Title == title {
-			l.books[i].Status = status
-			return nil
-		}
-	}
-	return errors.New("Libro no encontrado")
 }
 
 func (l *Library) FindBooks(query string) []Book {
@@ -189,6 +163,26 @@ func (l *Library) FindBooks(query string) []Book {
 	return foundBooks
 }
 
+func (l *Library) AddBook(title, author, genre string) {
+	book := Book{
+		Title:  title,
+		Author: author,
+		Genre:  genre,
+		Status: Available,
+	}
+	l.books = append(l.books, book)
+}
+
+func (l *Library) UpdateBookStatus(title string, status BookStatus) error {
+	for i, book := range l.books {
+		if book.Title == title {
+			l.books[i].Status = status
+			return nil
+		}
+	}
+	return errors.New("Libro no encontrado")
+}
+
 func (l *Library) RemoveBook(title string) error {
 	for i, book := range l.books {
 		if book.Title == title {
@@ -199,39 +193,42 @@ func (l *Library) RemoveBook(title string) error {
 	return errors.New("libro no encontrado")
 }
 
-func main(){
+func main() {
 	library := &Library{}
 
 	library.AddBook("El Quijote", "Miguel de Cervantes", "Novela")
 	library.AddBook("Cien años de soledad", "Gabriel García Márquez", "Novela")
-	library.AddBook("Inferno", "Dan Brown", "Suspenso")
-	library.showLibrary()
 
-	library.UpdateBookStatus("Inferno", Borrowed)
-	library.UpdateBookStatus("El Quijote", Borrowed)
-	library.showLibrary()
-
-	foundBooks := library.FindBooks("Dan Brown")
-	fmt.Println("Libros encontrados: ")
-	for _, book := range foundBooks {
-		fmt.Printf("Título: %s, Autor: %s, Género: %s, Estado: %s\n", book.Title, book.Author, book.Genre, book.Status)
+	err := library.UpdateBookStatus("El Quijote", Borrowed)
+	if err != nil {
+		fmt.Println("Error actualizando el estado del libro: ", err)
 	}
-	foundBooks= library.FindBooks("El Quijote")
+
+	foundBooks := library.FindBooks("Gabriel García Márquez")
 	fmt.Println("Libros encontrados: ")
 	for _, book := range foundBooks {
 		fmt.Printf("Título: %s, Autor: %s, Género: %s, Estado: %s\n", book.Title, book.Author, book.Genre, book.Status)
 	}
 
-	err := library.RemoveBook("Cien años de soledad")
+	err = library.RemoveBook("Cien años de soledad")
 	if err != nil {
 		fmt.Println("Error eliminando el libro: ", err)
 	}
-	library.showLibrary()
+
+	fmt.Println("Inventario completo: ")
+	for _, book := range library.books {
+		fmt.Printf("Título: %s, Autor: %s, Género: %s, Estado: %s\n", book.Title, book.Author, book.Genre, book.Status)
+	}
+
 }
 */
-
 /*
 //2.Sistema de gestión de tareas
+
+import (
+	"errors"
+	"fmt"
+)
 
 type TaskStatus string
 
@@ -244,7 +241,7 @@ const (
 type Task struct {
 	Name        string
 	Description string
-	Responsible    string
+	Assignee    string
 	Status      TaskStatus
 }
 
@@ -254,29 +251,22 @@ type TaskManager struct {
 
 func (tm *TaskManager) AddTask(name, description string) {
 	task := Task{
-		Name:			name,
-		Description: 	description,
-		Status:			Pending,
+
+		Name:        name,
+		Description: description,
+		Status:      Pending,
 	}
 	tm.tasks = append(tm.tasks, task)
-
 }
 
-func (tm *TaskManager) printTaskManager(){
-	for _, task :=range tm.tasks {
-		fmt.Printf(" Name: %s\n Description: %s\n Responsible: %s\n Status: %s\n", task.Name, task.Description, task.Responsible, task.Status)
-		fmt.Println("--------------------")
-	}
-}
-
-func (tm *TaskManager) AssignTask(name, responsible string) error {
+func (tm *TaskManager) AssignTask(name, assignee string) error {
 	for i, task := range tm.tasks {
 		if task.Name == name {
-			tm.tasks[i].Responsible = responsible
+			tm.tasks[i].Assignee = assignee
 			return nil
 		}
 	}
-	return errors.New("Tarea no encontrada")
+	return errors.New("tarea no encontrada")
 }
 
 func (tm *TaskManager) UpdateTaskStatus(name string, status TaskStatus) error {
@@ -302,40 +292,21 @@ func (tm *TaskManager) PendingTasks() []Task {
 func main() {
 	tm := &TaskManager{}
 
-	//creando nuevas tareas
 	tm.AddTask("Tarea 1", "Descripción de la tarea 1")
 	tm.AddTask("Tarea 2", "Descripcion de la tarea 2")
-	tm.AddTask("Tarea 3", "Descripcion de la tarea 3")
 
-	tm.printTaskManager()
-	fmt.Println("=================================")
-
-	err := tm.AssignTask("Tarea 1", "Raul Gonzalez")
-	if err != nil{
+	err := tm.AssignTask("Tarea 1", "Juan")
+	if err != nil {
 		fmt.Println("Error actualizando estado de tarea: ", err)
 	}
-	tm.AssignTask("Tarea 2", "Sami Gonzalez")
-	if err != nil{
-		fmt.Println("Error actualizando estado de tarea: ", err)
-	}
-
-	tm.printTaskManager()
-	fmt.Println("=================================")
-
-	tm.UpdateTaskStatus("Tarea 1", InProgress)
-	tm.UpdateTaskStatus("Tarea 2", Completed)
-	tm.printTaskManager()
-	fmt.Println("=================================")
 
 	pendingTasks := tm.PendingTasks()
-	fmt.Println("Tareas pendientes: ")
+	fmt.Printf("Tareas pendientes: ")
 	for _, task := range pendingTasks {
-		fmt.Printf("Nombre: %s\n, Descripcion: %s\n, Responsable: %s\n, Estado: %s\n", task.Name, task.Description, task.Responsible, task.Status)
+		fmt.Printf("Nombre: %s, Descripcion: %s, Responsable: %s, Estado: %s\n", task.Name, task.Description, task.Assignee, task.Status)
 	}
 }
 */
-
-///////////////////////////////////////////////////////////////////////////////////////
 /*
 //1.Gestion de Inventario
 
@@ -351,7 +322,7 @@ type Inventario struct {
 
 
 
-func (inv *Inventario) crearProducto(nombre string, precio float32, cantidad int) {
+func (inv *Inventario) CrearProducto(nombre string, precio float32, cantidad int) {
 	nuevoProducto:= Producto{
 		Nombre:		nombre,
 		Precio:		precio,
@@ -361,7 +332,7 @@ func (inv *Inventario) crearProducto(nombre string, precio float32, cantidad int
 
 }
 
-func (inv *Inventario) actualizarProducto(nombre string, cantidad int) error {
+func (inv *Inventario) ActualizarProducto(nombre string, cantidad int) error {
 	for i, producto:= range inv.productos{
 		if producto.Nombre == nombre {
 			inv.productos[i].Cantidad = cantidad
@@ -371,7 +342,7 @@ func (inv *Inventario) actualizarProducto(nombre string, cantidad int) error {
 	return errors.New("Producto no encontrado")
 }
 
-func (inv *Inventario) eliminarProducto(nombre string) error {
+func (inv *Inventario) EliminarProducto(nombre string) error {
 	for i, producto:= range inv.productos{
 		if producto.Nombre == nombre {
 			inv.productos = append(inv.productos[:i], inv.productos[i+1:]... )
@@ -381,7 +352,7 @@ func (inv *Inventario) eliminarProducto(nombre string) error {
 	return errors.New("Producto no encontrado")
 }
 
-func (inv *Inventario) mostrarInventario() {
+func (inv *Inventario) MostrarInventario() {
 	for _, producto :=range inv.productos {
 		fmt.Printf(" Nombre: %s\n Precio: %.2f\n Cantidad: %d\n", producto.Nombre, producto.Precio, producto.Cantidad)
 		fmt.Println("--------------------")
@@ -392,32 +363,32 @@ func main(){
 	inventario := &Inventario{}
 
 	//agregando nuevos productos al inventario
-	inventario.crearProducto("TV Samsung 32 pulgadas", 1049.99, 10)
-	inventario.crearProducto("Monitor LG 48 pulgadas",3500, 5)
-	inventario.crearProducto("Teclado LG",450.50, 100)
+	inventario.CrearProducto("TV Samsung 32 pulgadas", 1049.99, 10)
+    inventario.CrearProducto("Monitor LG 48 pulgadas",3500, 5)
+	inventario.CrearProducto("Teclado LG",450.50, 100)
 
-	//mostrar inventario
-	inventario.mostrarInventario()
+    //mostrar inventario
+	inventario.MostrarInventario()
 
 	fmt.Println("=====================================")
 
 	//actualizar Producto
-	err := inventario.actualizarProducto("Teclado LG",50)
+	err := inventario.ActualizarProducto("Teclado LG",50)
 	if err != nil{
 		fmt.Println("Error al actualizar la cantidad del producto:",err)
 	}
-	inventario.mostrarInventario()
+	inventario.MostrarInventario()
 
 
 	fmt.Println("=====================================")
 
 	//eliminar un producto
-	err = inventario.eliminarProducto("Teclado LG")
+	err = inventario.EliminarProducto("Teclado LG")
 	if err != nil{
 		fmt.Println("Error al eliminar el producto:",err)
 	}
 
-	inventario.mostrarInventario()
+	inventario.MostrarInventario()
 
 }
 */
